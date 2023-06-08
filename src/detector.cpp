@@ -1,5 +1,6 @@
 #include "detector.h"
 
+
 YOLODetector::YOLODetector(const std::string& modelPath,
                            const bool& isGPU = true,
                            const cv::Size& inputSize = cv::Size(640, 640))
@@ -57,6 +58,8 @@ YOLODetector::YOLODetector(const std::string& modelPath,
     this->inputImageShape = cv::Size2f(inputSize);
 }
 
+
+
 void YOLODetector::getBestClassInfo(std::vector<float>::iterator it, const int& numClasses,
                                     float& bestConf, int& bestClassId)
 {
@@ -74,6 +77,7 @@ void YOLODetector::getBestClassInfo(std::vector<float>::iterator it, const int& 
     }
 
 }
+
 
 void YOLODetector::preprocessing(cv::Mat &image, float*& blob, std::vector<int64_t>& inputTensorShape)
 {
@@ -204,3 +208,4 @@ std::vector<Detection> YOLODetector::detect(cv::Mat &image, const float& confThr
 
     return result;
 }
+

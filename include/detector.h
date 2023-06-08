@@ -13,13 +13,14 @@ public:
     YOLODetector(const std::string& modelPath,
                  const bool& isGPU,
                  const cv::Size& inputSize);
-
+    static YOLODetector createDetector(const std::string& modelPath, bool isGPU);
     std::vector<Detection> detect(cv::Mat &image, const float& confThreshold, const float& iouThreshold);
 
 private:
     Ort::Env env{nullptr};
     Ort::SessionOptions sessionOptions{nullptr};
     Ort::Session session{nullptr};
+
 
     void preprocessing(cv::Mat &image, float*& blob, std::vector<int64_t>& inputTensorShape);
     std::vector<Detection> postprocessing(const cv::Size& resizedImageShape,
