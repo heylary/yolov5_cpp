@@ -18,7 +18,8 @@ add_executable(yolo_cpp
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(ONNXRUNTIME_DIR ~/onnxruntime-linux-x64-1.12.1)
+#设置onnx库
+set(ONNXRUNTIME_DIR ~/onnxruntime-linux-x64-1.12.1) 
 
 target_include_directories(yolo_cpp PRIVATE "${ONNXRUNTIME_DIR}/include")
 # link_directories("${ONNXRUNTIME_DIR}/lib")
