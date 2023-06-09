@@ -56,7 +56,10 @@ int main(int argc, char* argv[])
             visualizeFrame(frame,result,classNames);    //可视化
             frameCount++;
             total_frames++;
-            calculateFPS(frameCount,start,frame);  //计算帧率
+            float fpsLime = calculateFPS(frameCount, start);
+            if (fpsLime > 0) {
+                printFps(fpsLime, frame);
+            }
             cv::imshow("detect", frame);
 
             if (cv::waitKey(1) == 'q') // 按下'q'键退出程序

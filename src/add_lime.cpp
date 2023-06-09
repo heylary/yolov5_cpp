@@ -49,6 +49,12 @@ int main(int argc, char* argv[])
         for(;;) {
             cv::Mat frame;
             cap >> frame;
+
+            float fpsBefore = calculateFPS(frameCount, start);
+            if (fpsBefore > 0) {
+                printFps(fpsBefore, frame);
+            }
+
             cv::imshow("before", frame);
             if (frame.empty())
             {
@@ -63,12 +69,17 @@ int main(int argc, char* argv[])
             cv::Mat enhancedFrame = limeProcessor.lime_enhance(frame);  //调用lime增强函数
             result = detectFrame(detector,enhancedFrame);   //检测lime后的帧
             visualizeFrame(enhancedFrame,result,classNames);    //可视化lime后的帧
+
+            float fpsLime = calculateFPS(frameCount, start);
+            if (fpsLime > 0) {
+                printFps(fpsLime, enhancedFrame);
+            }
             cv::imshow("lime",enhancedFrame);
 
             frameCount++;
             total_frames++;
-            calculateFPS(frameCount,start,frame);  //计算帧率
-            calculateFPS(frameCount,start,frame);  //计算lime后帧率
+            // calculateFPS(frameCount,start,frame);  //计算帧率
+            // calculateFPS(frameCount,start,enhancedFrame);  //计算lime后帧率
 
             if (cv::waitKey(1) == 'q') // 按下'q'键退出程序
                 break;

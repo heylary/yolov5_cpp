@@ -16,22 +16,19 @@ cv::VideoCapture captureVideo() {
 
 
 //计算帧率
-float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_point& start, cv::Mat& frame) {
-    //根据帧数以及计时器结果计算FPS
+float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_point& start) {
     if (frameCount >= FPS_CALC_THRESHOLD) {
         const auto end = std::chrono::high_resolution_clock::now();
         const double elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        const float fps = frameCount *1000.0 /  elapsed_time;
- 
+        const float fps = frameCount * 1000.0 / elapsed_time;
+
         frameCount = 0;
         start = std::chrono::high_resolution_clock::now();
-        if (fps > 0) {
-            printFps(fps,frame);
-        }
         return fps;
     }
     return -1;
 }
+
 //打印帧率
 void printFps(float fps, cv::Mat& frame) {
     std::cout << "FPS: " << fps << std::endl;

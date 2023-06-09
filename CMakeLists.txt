@@ -10,7 +10,7 @@ find_package(OpenCV 4.7.0 REQUIRED )
 include_directories("include/")
 
 add_executable(yolo_cpp
-               src/add_fps.cpp
+               src/add_thread.cpp
                src/detector.cpp
                src/lime.cpp
                src/visualizer.cpp

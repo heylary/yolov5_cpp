@@ -13,4 +13,4 @@ cv::VideoCapture captureVideo();
 void printFps(float fps, cv::Mat& frame);
 std::vector<Detection> detectFrame(YOLODetector& detector, cv::Mat& frame);
 void visualizeFrame(cv::Mat& frame, std::vector<Detection>& result, const std::vector<std::string>& classNames);
-float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_point& start, cv::Mat& frame);
+float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_point& start);
