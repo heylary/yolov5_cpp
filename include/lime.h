@@ -1,7 +1,3 @@
-//
-// Created by zj on 19-4-18.
-//
-
 #ifndef FEATURE_EXACTION_LIME_H
 #define FEATURE_EXACTION_LIME_H
 #include <opencv2/core/core.hpp>
