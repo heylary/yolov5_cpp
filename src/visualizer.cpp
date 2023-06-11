@@ -4,13 +4,32 @@
 #include <iostream>
 #include <exception>
 
+bool isImageFile(const std::string& path) {
+    std::string extension = path.substr(path.find_last_of(".") + 1);
+    return extension == "jpg" || extension == "png" || extension == "jpeg";
+}
+
 //打开摄像头
-cv::VideoCapture captureVideo() {
-    cv::VideoCapture cap(0);
-    if (!cap.isOpened()) {
-        std::cerr << "Error: Unable to open camera." << std::endl;
-        throw;
+cv::VideoCapture captureVideo(const std::string& inputPath, cv::Mat& image) {
+    cv::VideoCapture cap;
+
+    // 判断输入是否为图像
+    if (isImageFile(inputPath)) {
+        image = cv::imread(inputPath);
+
+        if (image.empty()) {
+            std::cerr << "Error: Unable to open image: " << inputPath << std::endl;
+            throw;
+        }
+    } else {
+        cap.open(0);
+
+        if (!cap.isOpened()) {
+            std::cerr << "Error: Unable to open camera." << std::endl;
+            throw;
+        }
     }
+
     return cap;
 }
 

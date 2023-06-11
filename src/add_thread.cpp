@@ -9,10 +9,13 @@
 #include "visualizer.h"
 #include "lime.h"
 
-void processBeforeFrame(cv::VideoCapture& cap, int& frameCount, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
+
+void processBeforeFrame(bool isImage, const cv::Mat& inputImage, cv::VideoCapture& cap, int& frameCount, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
     for (;;) {
         cv::Mat frame;
-        {
+        if(isImage) {
+            frame = inputImage.clone();
+        }else {
             std::unique_lock<std::mutex> lock(mtx);
             cap >> frame;
             frameCount++;
@@ -22,17 +25,23 @@ void processBeforeFrame(cv::VideoCapture& cap, int& frameCount, std::chrono::hig
             printFps(fpsBefore, frame);
         }
         cv::imshow("before", frame);
-        if (cv::waitKey(1) == 'q') {
+        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+            break;
+        }
+
+        if (isImage && frameCount > 1) {
             break;
         }
     }
 }
 
-void processDetectFrame(YOLODetector& detector, cv::VideoCapture& cap, int& frameCount, const std::vector<std::string>& classNames, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
+void processDetectFrame(bool isImage, const cv::Mat& inputImage, YOLODetector& detector, cv::VideoCapture& cap, int& frameCount, const std::vector<std::string>& classNames, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
     for (;;) {
         cv::Mat frame;
         std::vector<Detection> result;
-        {
+        if(isImage) {
+            frame = inputImage.clone();
+        }else {
             std::unique_lock<std::mutex> lock(mtx);
             cap >> frame;
             frameCount++;
@@ -44,17 +53,23 @@ void processDetectFrame(YOLODetector& detector, cv::VideoCapture& cap, int& fram
             printFps(fpsDetect, frame);
         }
         cv::imshow("detect", frame);
-        if (cv::waitKey(1) == 'q') {
+        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+            break;
+        }
+
+        if (isImage && frameCount > 1) {
             break;
         }
     }
 }
 
-void processLimeFrame(YOLODetector& detector, cv::VideoCapture& cap, int& frameCount, const std::vector<std::string>& classNames, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
+void processLimeFrame(bool isImage, const cv::Mat& inputImage, YOLODetector& detector, cv::VideoCapture& cap, int& frameCount, const std::vector<std::string>& classNames, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
     for (;;) {
         cv::Mat frame;
         std::vector<Detection> result;
-        {
+        if(isImage) {
+            frame = inputImage.clone();
+        }else {
             std::unique_lock<std::mutex> lock(mtx);
             cap >> frame;
             frameCount++;
@@ -69,11 +84,16 @@ void processLimeFrame(YOLODetector& detector, cv::VideoCapture& cap, int& frameC
             printFps(fpsLime, enhancedFrame);
         }
         cv::imshow("lime", enhancedFrame);
-        if (cv::waitKey(1) == 'q') {
+        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+            break;
+        }
+
+        if (isImage && frameCount > 1) {
             break;
         }
     }
 }
+
 
 int main(int argc, char* argv[]) {
     cv::namedWindow("before");
@@ -83,6 +103,7 @@ int main(int argc, char* argv[]) {
     cmdline::parser cmd;
     cmd.add<std::string>("model_path", 'm', "Path to onnx model.", true, "yolov5.onnx");
     cmd.add<std::string>("class_names", 'c', "Path to class names file.", true, "coco.names");
+    cmd.add<std::string>("input", 'i', "Path to the input image or video file.", true, "");
     cmd.add("gpu", '\0', "Inference on cuda device.");
 
     cmd.parse_check(argc, argv);
@@ -91,6 +112,7 @@ int main(int argc, char* argv[]) {
     const std::string classNamesPath = cmd.get<std::string>("class_names");
     const std::vector<std::string> classNames = utils::loadNames(classNamesPath);
     const std::string modelPath = cmd.get<std::string>("model_path");
+    const std::string inputPath = cmd.get<std::string>("input");
 
     if (classNames.empty())
     {
@@ -99,21 +121,22 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<Detection> result;
-
+    cv::Mat inputImage;
     try
     {
         YOLODetector detector(modelPath, isGPU, cv::Size(640, 640));
-        cv::VideoCapture cap = captureVideo(); // 0代表默认摄像头
+        cv::VideoCapture cap = captureVideo(inputPath,inputImage); // 0代表默认摄像头
         //创建高精度计时器
         auto start = std::chrono::high_resolution_clock::now();
         //纪录视频帧数
         int frameCount = 0;
         std::mutex cap_mtx;
+        bool isImage = isImageFile(inputPath);
 
-        std::thread beforeThread(processBeforeFrame, std::ref(cap), std::ref(frameCount), std::ref(start), std::ref(cap_mtx));
-        std::thread detectThread(processDetectFrame, std::ref(detector), std::ref(cap), std::ref(frameCount), std::ref(classNames), std::ref(start), std::ref(cap_mtx));
-        std::thread limeThread(processLimeFrame, std::ref(detector), std::ref(cap), std::ref(frameCount), std::ref(classNames), std::ref(start), std::ref(cap_mtx));
-
+        std::thread beforeThread(processBeforeFrame, isImage, std::ref(inputImage), std::ref(cap), std::ref(frameCount), std::ref(start), std::ref(cap_mtx));
+        std::thread detectThread(processDetectFrame, isImage, std::ref(inputImage), std::ref(detector), std::ref(cap), std::ref(frameCount), std::ref(classNames), std::ref(start), std::ref(cap_mtx));
+        std::thread limeThread(processLimeFrame, isImage, std::ref(inputImage), std::ref(detector), std::ref(cap), std::ref(frameCount), std::ref(classNames), std::ref(start), std::ref(cap_mtx));
+        
         beforeThread.join();
         detectThread.join();
         limeThread.join();
