@@ -4,6 +4,11 @@
 #include <iostream>
 #include <exception>
 
+bool showAndWait(const std::string& winName, const cv::Mat& image, bool isImage) {
+    cv::imshow(winName, image);
+    return cv::waitKey(isImage ? 0 : 1) == 'q';
+}
+
 bool isImageFile(const std::string& path) {
     std::string extension = path.substr(path.find_last_of(".") + 1);
     return extension == "jpg" || extension == "png" || extension == "jpeg";
@@ -22,10 +27,16 @@ cv::VideoCapture captureVideo(const std::string& inputPath, cv::Mat& image) {
             throw;
         }
     } else {
-        cap.open(0);
+        // 尝试打开输入路径作为视频文件
+        cap.open(inputPath);
+
+        // 如果无法打开输入路径作为视频文件，则尝试打开摄像头
+        if (!cap.isOpened()) {
+            cap.open(0);
+        }
 
         if (!cap.isOpened()) {
-            std::cerr << "Error: Unable to open camera." << std::endl;
+            std::cerr << "Error: Unable to open video or camera." << std::endl;
             throw;
         }
     }

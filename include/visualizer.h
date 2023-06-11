@@ -15,3 +15,4 @@ std::vector<Detection> detectFrame(YOLODetector& detector, cv::Mat& frame);
 void visualizeFrame(cv::Mat& frame, std::vector<Detection>& result, const std::vector<std::string>& classNames);
 float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_point& start);
 bool isImageFile(const std::string& path);
+bool showAndWait(const std::string& winName, const cv::Mat& image, bool isImage);

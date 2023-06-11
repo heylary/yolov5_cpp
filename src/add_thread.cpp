@@ -9,7 +9,6 @@
 #include "visualizer.h"
 #include "lime.h"
 
-
 void processBeforeFrame(bool isImage, const cv::Mat& inputImage, cv::VideoCapture& cap, int& frameCount, std::chrono::high_resolution_clock::time_point& start, std::mutex& mtx) {
     for (;;) {
         cv::Mat frame;
@@ -24,8 +23,7 @@ void processBeforeFrame(bool isImage, const cv::Mat& inputImage, cv::VideoCaptur
         if (fpsBefore > 0) {
             printFps(fpsBefore, frame);
         }
-        cv::imshow("before", frame);
-        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+        if (showAndWait("before", frame, isImage)) {
             break;
         }
 
@@ -52,8 +50,7 @@ void processDetectFrame(bool isImage, const cv::Mat& inputImage, YOLODetector& d
         if (fpsDetect > 0) {
             printFps(fpsDetect, frame);
         }
-        cv::imshow("detect", frame);
-        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+        if (showAndWait("detect", frame, isImage)) {
             break;
         }
 
@@ -83,8 +80,7 @@ void processLimeFrame(bool isImage, const cv::Mat& inputImage, YOLODetector& det
         if (fpsLime > 0) {
             printFps(fpsLime, enhancedFrame);
         }
-        cv::imshow("lime", enhancedFrame);
-        if (cv::waitKey(isImage ? 0 : 1) == 'q') {
+        if (showAndWait("lime", frame, isImage)) {
             break;
         }
 
