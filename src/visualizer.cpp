@@ -60,15 +60,17 @@ float calculateFPS(int& frameCount, std::chrono::high_resolution_clock::time_poi
 }
 
 //打印帧率
-void printFps(float fps, cv::Mat& frame) {
-    std::cout << "FPS: " << fps << std::endl;
+void printFps(float fps, cv::Mat& frame, const std::string& windowName) {
     std::ostringstream fps_label;
     fps_label << std::fixed << std::setprecision(2);
     fps_label << "FPS: " << fps;
     std::string fps_label_str = fps_label.str();
 
-    cv::putText(frame, fps_label_str.c_str(), cv::Point(10, 25), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2);
+    cv::putText(frame, fps_label_str, cv::Point(10, 25), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2);
+    cv::putText(frame, windowName, cv::Point(10, 60), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2);
 }
+
+
 
 //目标检测
 std::vector<Detection> detectFrame(YOLODetector& detector, cv::Mat& frame) {

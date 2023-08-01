@@ -26,11 +26,7 @@ void processFrame(bool isImage, const cv::Mat& inputImage, YOLODetector& detecto
         if (!isImage) {
             float fps = calculateFPS(frameCount, start);
             if (fps > 0) {
-<<<<<<< HEAD
-                printFps(fps, frame);
-=======
                 printFps(fps, frame, windowName + " ");
->>>>>>> f4ee2578a4644196cb5f22aff8b7cda306351420
             }
         }
         if(windowName == "before") {
